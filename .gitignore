@@ -1,0 +1,28 @@
+# Dependencies
+node_modules/
+
+# Next.js build output
+.next/
+out/
+dist/
+
+# Secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+
+# Backups and logs
+*.backup
+*.bak
+*.dump
+*.log
+backups/
+logs/
+
+# Tool caches
+*.tsbuildinfo
+.DS_Store

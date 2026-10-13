@@ -1,0 +1,12 @@
+export type Category = 'Women'|'Men'|'Accessories';
+export type Product={id:number;name:string;category:Category;type:string;price:number;image:string;altImage:string;tag?:string;colors:string[];sizes:string[];description:string};
+const photos = (id:string,w=900)=>`https://images.unsplash.com/${id}?auto=format&fit=crop&w=${w}&q=85`;
+export const products:Product[]=[
+ {id:1,name:'The Sculpted Blazer',category:'Women',type:'Tailoring',price:6490,image:photos('photo-1591047139829-d91aecb6caea'),altImage:photos('photo-1539109136881-3be0616acf4b'),tag:'BESTSELLER',colors:['Black','Stone'],sizes:['XS','S','M','L'],description:'A modern expression of structured tailoring, designed to outlast the season.'},
+ {id:2,name:'Form & Function Shirt',category:'Men',type:'Shirts',price:3290,image:photos('photo-1598032895397-b9472444bf93'),altImage:photos('photo-1620012253295-c15cc3e65df4'),tag:'NEW',colors:['Ivory','Black'],sizes:['S','M','L','XL'],description:'Considered proportions and refined detail, rendered in lightweight cotton.'},
+ {id:3,name:'Everyday Form Tee',category:'Women',type:'Essentials',price:1890,image:photos('photo-1503342217505-b0a15ec3261c'),altImage:photos('photo-1483985988355-763728e1935b'),colors:['Ivory','Black','Olive'],sizes:['XS','S','M','L','XL'],description:'An essential silhouette, elevated by its feel and fit.'},
+ {id:4,name:'Relaxed Studio Trousers',category:'Men',type:'Bottoms',price:4490,image:photos('photo-1473966968600-fa801b869a1a'),altImage:photos('photo-1511196044526-5cb3bcb7071b'),tag:'LIMITED',colors:['Black','Stone'],sizes:['S','M','L','XL'],description:'Clean, effortless tailoring for wherever the day leads.'},
+ {id:5,name:'The Atelier Carryall',category:'Accessories',type:'Bags',price:5490,image:photos('photo-1547949003-9792a18a2601'),altImage:photos('photo-1584917865442-de89df76afd3'),tag:'NEW',colors:['Black','Tan'],sizes:['ONE SIZE'],description:'The everyday companion with a quietly distinctive silhouette.'},
+ {id:6,name:'Arc Minimal Sunglasses',category:'Accessories',type:'Eyewear',price:2490,image:photos('photo-1511499767150-a48a237f0083'),altImage:photos('photo-1473496169904-658ba7c44d8a'),colors:['Black','Tan'],sizes:['ONE SIZE'],description:'A defining finishing touch with pared-back, timeless appeal.'}
+];
+export const money=(n:number)=>new Intl.NumberFormat('en-IN',{style:'currency',currency:'INR',maximumFractionDigits:0}).format(n);

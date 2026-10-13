@@ -1,0 +1,1 @@
+DRAGONTAIL account panel patch for Phase 6. Adds slide-out account menu, orders placeholder, authenticated password change. Requires existing Phase 6 account tables and routes. Backup src before extraction. npm run build before pm2 restart. Change-password requires current password and HTTPS; this is not email-based forgot-password recovery. No database migration required.

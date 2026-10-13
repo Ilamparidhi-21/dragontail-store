@@ -1,0 +1,6 @@
+import type { Metadata } from 'next';
+import './globals.css';
+export const metadata: Metadata = { title:'DRAGONTAIL | Objects of Desire', description:'DRAGONTAIL — contemporary essentials with a bold point of view.' };
+export default function RootLayout({children}:{children:React.ReactNode}) { return <html lang="en"><body>{children}</body></html> }
+
+export const viewport = { width: "device-width", initialScale: 1 };

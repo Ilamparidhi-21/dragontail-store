@@ -1,0 +1,5 @@
+import {NextResponse} from 'next/server';
+import {db} from '@/lib/db';
+import {products as fallback} from '@/lib/catalog';
+export const dynamic='force-dynamic';
+export async function GET(){try{const result=await db.query(`SELECT id,name,category,type,price,image,alt_image AS "altImage",tag,colors,sizes,description, COALESCE((SELECT json_agg(json_build_object('color',i.color,'size',i.size,'quantity',i.quantity)) FROM dt_inventory i WHERE i.product_id=dt_products.id),'[]'::json) AS inventory FROM dt_products WHERE active = true ORDER BY id ASC LIMIT 300`);return NextResponse.json({products:result.rows,source:'database'},{headers:{'Cache-Control':'no-store'}})}catch(e){console.error('product database unavailable',e);return NextResponse.json({products:fallback,source:'demo',warning:'Database unavailable; showing demo catalog'},{headers:{'Cache-Control':'no-store'}})}}
