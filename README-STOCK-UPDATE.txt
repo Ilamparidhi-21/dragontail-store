@@ -1,0 +1,1 @@
+Stock editor groups existing variants by color. No SQL migration. Save stock persists all quantities. Suggested color label for off-white waffle garment: Ecru; rename in product editor and reassign quantities for renamed variant before publishing.
