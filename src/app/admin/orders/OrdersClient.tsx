@@ -1,7 +1,8 @@
 'use client';
+import AdminSidebar from '@/components/AdminSidebar';
 import {useCallback,useEffect,useMemo,useState} from 'react';
 import Link from 'next/link';
-import {LayoutDashboard,Package,ShoppingBag,Users,BarChart3,Settings,Search,Download,RefreshCw,ChevronRight,Menu,X,Clock3,ArrowUpRight,SlidersHorizontal,Eye} from 'lucide-react';
+import {LayoutDashboard,Package,ShoppingBag,Users,BarChart3,Settings,Search,Download,RefreshCw,ChevronRight,Menu,X,Clock3,ArrowUpRight,SlidersHorizontal,Eye,Layers3} from 'lucide-react';
 import styles from './orders.module.css';
 import AdminAvatar from '@/components/AdminAvatar';
 type Item={name:string;color:string;size:string;qty:number;price:number};
@@ -12,6 +13,7 @@ const payLabel=(s:string)=>({unpaid:'Unpaid',pending:'Pending',paid:'Paid',faile
 const fulfillLabel=(s:string)=>({awaiting_payment:'Unfulfilled',paid:'Unfulfilled',processing:'Processing',shipped:'Shipped',delivered:'Fulfilled',cancelled:'Cancelled',refunded:'Refunded'} as Record<string,string>)[s]||s;
 function csvQuote(v:unknown){const s=String(v??'');return '"'+s.replace(/"/g,'""')+'"'}
 export default function OrderStudio(){
+ const [overviewOpen,setOverviewOpen]=useState(true);
  const [orders,setOrders]=useState<Order[]>([]),[loading,setLoading]=useState(true),[error,setError]=useState(''),[notice,setNotice]=useState('');
  const [query,setQuery]=useState(''),[filter,setFilter]=useState('all'),[sort,setSort]=useState<'new'|'old'|'high'|'low'>('new'),[selected,setSelected]=useState<Order|null>(null),[tracking,setTracking]=useState(''),[saving,setSaving]=useState(false),[mobileMenu,setMobileMenu]=useState(false);
  const load=useCallback(async()=>{setLoading(true);setError('');try{const r=await fetch('/api/admin/orders',{cache:'no-store',credentials:'same-origin'});if(r.status===401){setError('Administrator session required. Sign in through Product Studio.');setOrders([]);return}if(!r.ok)throw new Error('Could not load orders ('+r.status+')');const j=await r.json();if(!Array.isArray(j.orders))throw new Error('Unexpected server response');setOrders(j.orders)}catch(e){setError(e instanceof Error?e.message:'Could not load orders')}finally{setLoading(false)}},[]);
@@ -22,7 +24,7 @@ export default function OrderStudio(){
  const update=async(o:Order,status:string)=>{if(saving)return;if(!window.confirm(`${status==='cancelled'?'Cancel':'Mark as '+status} ${o.order_number}?`))return;setSaving(true);setNotice('');try{const r=await fetch('/api/admin/orders',{method:'PATCH',credentials:'same-origin',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:o.id,status,tracking_number:tracking.trim()})});const j=await r.json();if(!r.ok)throw new Error(j.error||'Update failed');setNotice(o.order_number+' updated');setSelected(null);await load()}catch(e){setNotice(e instanceof Error?e.message:'Update failed')}finally{setSaving(false)}};
  const nav=[{label:'Overview',icon:LayoutDashboard,href:'/admin/orders'},{label:'Orders',icon:ShoppingBag,href:'/admin/orders'},{label:'Products',icon:Package,href:'/admin/products'},{label:'Collections',icon:Package,href:'/admin/collections'},{label:'Storefront',icon:ArrowUpRight,href:'/'}];
  return <div className={styles.shell}>
-  <aside className={`${styles.sidebar} ${mobileMenu?styles.sidebarOpen:''}`}><div className={styles.brand}>DRAGONTAIL <span>✦</span><button className={styles.closeMobile} onClick={()=>setMobileMenu(false)} aria-label="Close menu"><X size={19}/></button></div><div className={styles.sideCaption}>COMMERCE MANAGER</div><nav aria-label="Admin navigation">{nav.map(n=><Link key={n.label} href={n.href} target={n.label==='Storefront'?'_blank':undefined} rel={n.label==='Storefront'?'noopener noreferrer':undefined} onClick={()=>setMobileMenu(false)} className={`${styles.navItem} ${n.label==='Orders'?styles.navActive:''}`}><n.icon size={17}/>{n.label}{n.label==='Orders'&&<span className={styles.navCount}>{orders.length}</span>}</Link>)}<div className={styles.navDivider}/><div className={styles.navMuted}><Users size={17}/> Customers <small>SOON</small></div><div className={styles.navMuted}><BarChart3 size={17}/> Analytics <small>SOON</small></div><div className={styles.navMuted}><Settings size={17}/> Settings <small>SOON</small></div></nav><div className={styles.sideBottom}><span className={styles.dot}/><span>Order Studio · Development</span></div></aside>
+  <AdminSidebar active="orders" mobile={mobileMenu} onClose={()=>setMobileMenu(false)} count={orders.length}/>
   {mobileMenu&&<button className={styles.menuBackdrop} onClick={()=>setMobileMenu(false)} aria-label="Close navigation"/>}
   <main className={styles.main}>
    <header className={styles.topbar}><button className={styles.mobileToggle} onClick={()=>setMobileMenu(true)} aria-label="Open navigation"><Menu size={21}/></button><div className={styles.breadcrumb}>ADMIN <ChevronRight size={14}/> <strong>ORDERS</strong></div><div className={styles.topRight}><AdminAvatar/></div></header>

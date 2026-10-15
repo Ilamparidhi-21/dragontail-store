@@ -12,7 +12,7 @@ const statusText=(s:string)=>({awaiting_payment:'Awaiting payment',paid:'Payment
 export default async function OrdersPage(){
  const customer=await currentCustomer();if(!customer)redirect('/account?mode=login');
  const result=await db.query(`SELECT o.order_number,o.total,o.payment_status,o.status,o.created_at,
- COALESCE((SELECT json_agg(json_build_object('name',i.name,'color',i.color,'size',i.size,'quantity',i.quantity,'unit_price',i.unit_price,'image',p.image) ORDER BY i.id) FROM dt_order_items i LEFT JOIN dt_products p ON p.id=i.product_id WHERE i.order_id=o.id),'[]'::json) AS items
+ COALESCE((SELECT json_agg(json_build_object('name',i.name,'color',i.color,'size',i.size,'quantity',i.quantity,'unit_price',i.unit_price,'image',COALESCE(NULLIF(p.color_images -> i.color ->> 0,''),p.image)) ORDER BY i.id) FROM dt_order_items i LEFT JOIN dt_products p ON p.id=i.product_id WHERE i.order_id=o.id),'[]'::json) AS items
  FROM dt_orders o WHERE o.customer_id=$1 ORDER BY o.created_at DESC LIMIT 100`,[customer.id]);
  const orders=result.rows as Order[];
  return <main className={styles.page}><div className={styles.wrap}>

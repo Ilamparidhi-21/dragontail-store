@@ -14,7 +14,7 @@ export async function POST(req:NextRequest){
  try{
   const lines=[];let subtotal=0;
   for(const x of items){
-   const r=await db.query('SELECT p.id,p.name,p.price,p.image,i.quantity AS stock FROM dt_products p JOIN dt_inventory i ON i.product_id=p.id AND i.color=$2 AND i.size=$3 WHERE p.id=$1 AND p.active=true',[x.id,x.color,x.size]);
+   const r=await db.query(`SELECT p.id,p.name,p.price,COALESCE(NULLIF(p.color_images -> $2 ->> 0,''),p.image) AS image,i.quantity AS stock FROM dt_products p JOIN dt_inventory i ON i.product_id=p.id AND i.color=$2 AND i.size=$3 WHERE p.id=$1 AND p.active=true`,[x.id,x.color,x.size]);
    if(!r.rows.length)return NextResponse.json({error:`Unavailable: ${x.color} / ${x.size}`},{status:409});
    const p=r.rows[0];if(Number(p.stock)<x.qty)return NextResponse.json({error:`Only ${p.stock} unit(s) left: ${p.name} ${x.color} / ${x.size}`},{status:409});
    subtotal+=Number(p.price)*x.qty;

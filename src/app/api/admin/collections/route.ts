@@ -7,3 +7,22 @@ const slugify=(s:string)=>s.toLowerCase().trim().normalize('NFKD').replace(/[^a-
 export async function GET(){if(!await authenticated())return denied();try {const {rows}=await db.query(`SELECT c.id,c.name,c.slug,c.description,c.cover_image AS "coverImage",c.active,c.sort_order AS "sortOrder", COALESCE(array_agg(cp.product_id ORDER BY cp.product_id) FILTER (WHERE cp.product_id IS NOT NULL),ARRAY[]::integer[]) AS "productIds" FROM dt_collections c LEFT JOIN dt_collection_products cp ON cp.collection_id=c.id GROUP BY c.id ORDER BY c.sort_order,c.id`);return NextResponse.json({collections:rows})}catch{return NextResponse.json({error:'Database unavailable'},{status:503})}}
 export async function POST(req:NextRequest){if(!await authenticated())return denied();const data=await req.json().catch(()=>null);const name=typeof data?.name==='string'?data.name.trim().slice(0,90):'';const slug=slugify(name);if(!name||!slug)return NextResponse.json({error:'Name required'},{status:400});try{const {rows}=await db.query('INSERT INTO dt_collections(name,slug) VALUES($1,$2) RETURNING id',[name,slug]);return NextResponse.json({id:rows[0].id},{status:201})}catch{return NextResponse.json({error:'Could not create collection. Name may already exist.'},{status:409})}}
 export async function PUT(req:NextRequest){if(!await authenticated())return denied();const d=await req.json().catch(()=>null);const id=Number(d?.id);const name=typeof d?.name==='string'?d.name.trim().slice(0,90):'';const description=typeof d?.description==='string'?d.description.trim().slice(0,1000):'';const coverImage=typeof d?.coverImage==='string'?d.coverImage.trim().slice(0,1500):'';const sortOrder=Number(d?.sortOrder??100);const active=d?.active===true;const productIds=d?.productIds;if(!Number.isSafeInteger(id)||id<1||!name||!Number.isInteger(sortOrder)||sortOrder<0||sortOrder>9999||coverImage&&!/^https:\/\//.test(coverImage)||!Array.isArray(productIds)||productIds.length>500||productIds.some((x:unknown)=>!Number.isSafeInteger(x)||Number(x)<1))return NextResponse.json({error:'Invalid collection details'},{status:400});const client=await db.connect().catch(()=>null);if(!client)return NextResponse.json({error:'Database unavailable'},{status:503});try{await client.query('BEGIN');const updated=await client.query('UPDATE dt_collections SET name=$1,description=$2,cover_image=$3,sort_order=$4,active=$5 WHERE id=$6 RETURNING id',[name,description,coverImage,sortOrder,active,id]);if(!updated.rowCount){await client.query('ROLLBACK');return NextResponse.json({error:'Collection not found'},{status:404})}await client.query('DELETE FROM dt_collection_products WHERE collection_id=$1',[id]);if(productIds.length)await client.query('INSERT INTO dt_collection_products(collection_id,product_id) SELECT $1,p.id FROM dt_products p WHERE p.id=ANY($2::int[])',[id,productIds]);await client.query('COMMIT');return NextResponse.json({ok:true})}catch(e){await client.query('ROLLBACK').catch(()=>{});console.error('collection save failed',e);return NextResponse.json({error:'Unable to save collection'},{status:503})}finally{client.release()}}
+
+export async function DELETE(req:NextRequest){
+ if(!await authenticated())return denied();
+ const data=await req.json().catch(()=>null);
+ const id=Number(data?.id);
+ if(!Number.isSafeInteger(id)||id<1)return NextResponse.json({error:'Invalid collection id'},{status:400});
+ const client=await db.connect().catch(()=>null);
+ if(!client)return NextResponse.json({error:'Database unavailable'},{status:503});
+ try{
+  await client.query('BEGIN');
+  const existing=await client.query('SELECT slug FROM dt_collections WHERE id=$1 FOR UPDATE',[id]);
+  if(!existing.rowCount){await client.query('ROLLBACK');return NextResponse.json({error:'Collection not found'},{status:404})}
+  if(existing.rows[0].slug==='new-arrivals'){await client.query('ROLLBACK');return NextResponse.json({error:'Automatic New Arrivals collection cannot be deleted'},{status:403})}
+  await client.query('DELETE FROM dt_collection_products WHERE collection_id=$1',[id]);
+  await client.query('DELETE FROM dt_collections WHERE id=$1',[id]);
+  await client.query('COMMIT');
+  return NextResponse.json({ok:true});
+ }catch(e){await client.query('ROLLBACK').catch(()=>{});console.error('collection removal failed',e);return NextResponse.json({error:'Unable to remove collection'},{status:503})}finally{client.release()}
+}

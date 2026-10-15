@@ -1,0 +1,7 @@
+.dtSharedOverview{width:100%;border:0;background:transparent;text-align:left;color:#ddd!important;border-radius:6px!important}
+.dtSharedOverview:hover,.dtSharedOverview:focus-visible{background:#292929!important;color:white!important}
+.dtSharedChevron{margin-left:auto;font-size:17px;color:#aaa}
+.dtSharedChildren{padding-left:11px;margin:3px 0 7px}
+.dtSharedChildren .dtSharedActive{background:transparent!important;color:#fff!important;font-weight:600;border-radius:0!important;border-left:2px solid white;padding-left:11px}
+.dtSharedChildren .dtSharedActive:hover{background:#292929!important}
+.dtSharedChildren a:not(.dtSharedActive){border-left:2px solid transparent;padding-left:11px}

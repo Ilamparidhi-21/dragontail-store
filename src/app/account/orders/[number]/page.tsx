@@ -13,7 +13,7 @@ export default async function OrderDetails({params}:{params:Promise<{number:stri
  const {number}=await params;
  if(!/^DT-[A-Z0-9]{6,24}$/.test(number))notFound();
  const result=await db.query(`SELECT o.order_number,o.created_at,o.status,o.payment_status,o.payment_provider,o.payment_reference,o.subtotal,o.delivery_fee,o.total,o.recipient,o.address_line1,o.address_line2,o.city,o.state,o.postal_code,o.carrier,o.tracking_number,
- COALESCE((SELECT json_agg(json_build_object('name',i.name,'color',i.color,'size',i.size,'quantity',i.quantity,'unit_price',i.unit_price,'image',p.image) ORDER BY i.id) FROM dt_order_items i LEFT JOIN dt_products p ON p.id=i.product_id WHERE i.order_id=o.id),'[]'::json) AS items FROM dt_orders o WHERE o.customer_id=$1 AND o.order_number=$2 LIMIT 1`,[user.id,number]);
+ COALESCE((SELECT json_agg(json_build_object('name',i.name,'color',i.color,'size',i.size,'quantity',i.quantity,'unit_price',i.unit_price,'image',COALESCE(NULLIF(p.color_images -> i.color ->> 0,''),p.image)) ORDER BY i.id) FROM dt_order_items i LEFT JOIN dt_products p ON p.id=i.product_id WHERE i.order_id=o.id),'[]'::json) AS items FROM dt_orders o WHERE o.customer_id=$1 AND o.order_number=$2 LIMIT 1`,[user.id,number]);
  if(!result.rows.length)notFound();const o=result.rows[0] as Order;
  const progress=['paid','processing','shipped','delivered']; const idx=progress.indexOf(o.status); const cancelled=o.status==='cancelled'||o.status==='refunded';
  return <main className={styles.page}><div className={styles.wrap}>
