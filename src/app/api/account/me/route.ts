@@ -1,4 +1,6 @@
-import {NextResponse} from 'next/server';
-import {currentCustomer} from '@/lib/customer-auth';
+import {NextRequest,NextResponse} from 'next/server';
+import {currentCustomer,safeMutation,readText} from '@/lib/customer-auth';
+import {db} from '@/lib/db';
 export const dynamic='force-dynamic';
 export async function GET(){try{const user=await currentCustomer();return NextResponse.json({user},{headers:{'Cache-Control':'no-store'}})}catch{return NextResponse.json({error:'Unavailable'},{status:503})}}
+export async function PUT(req:NextRequest){if(!await safeMutation(req))return NextResponse.json({error:'Forbidden'},{status:403});try{const user=await currentCustomer();if(!user)return NextResponse.json({error:'Unauthorized'},{status:401});const d=await req.json().catch(()=>null);if(!d||typeof d!=='object'||typeof d.displayName!=='string'||d.displayName.length>100)return NextResponse.json({error:'Enter a name up to 100 characters'},{status:400});const name=readText(d,'displayName',100);if(name.length<2)return NextResponse.json({error:'Enter your full name'},{status:400});await db.query('UPDATE dt_customers SET display_name=$1,updated_at=NOW() WHERE id=$2',[name,user.id]);return NextResponse.json({ok:true});}catch{return NextResponse.json({error:'Unable to save profile'},{status:503})}}

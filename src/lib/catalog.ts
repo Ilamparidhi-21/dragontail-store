@@ -1,5 +1,6 @@
+import type {ProductDetails} from './product-details';
 export type Category = 'Women'|'Men'|'Accessories';
-export type Product={id:number;name:string;category:Category;type:string;price:number;image:string;altImage:string;tag?:string;colors:string[];sizes:string[];description:string};
+export type Product={id:number;name:string;category:Category;type:string;price:number;image:string;altImage:string;tag?:string;colors:string[];sizes:string[];description:string;details?:ProductDetails};
 const photos = (id:string,w=900)=>`https://images.unsplash.com/${id}?auto=format&fit=crop&w=${w}&q=85`;
 export const products:Product[]=[
  {id:1,name:'The Sculpted Blazer',category:'Women',type:'Tailoring',price:6490,image:photos('photo-1591047139829-d91aecb6caea'),altImage:photos('photo-1539109136881-3be0616acf4b'),tag:'BESTSELLER',colors:['Black','Stone'],sizes:['XS','S','M','L'],description:'A modern expression of structured tailoring, designed to outlast the season.'},
