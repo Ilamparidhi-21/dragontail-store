@@ -282,3 +282,93 @@ html,body{width:100%;max-width:100%;overflow-x:clip}
  .collection-section .sort-wrap select{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;margin:0;padding:0}
  .collection-section .sort-wrap:focus-within{outline:2px solid #171717;outline-offset:3px}
 }
+
+/* Soft selection states */
+:root{--dt-selection:#eceeef;--dt-focus-shade:rgba(110,120,130,.18)}
+button[aria-pressed="true"],button[aria-selected="true"],
+.size-options button.selected,.dt-swatches button.picked,
+.dt-thumbs button.active,.filter-tabs button.current,
+.dt-edit-filters button.selected,
+button.dtCategoryActive,button.dtStockColorActive,button.dtc-selected,
+button[class*="sizeActive"],button[class*="colorSelected"]{
+ background:var(--dt-selection)!important;color:#171717!important;
+ border-color:transparent!important;outline:none!important;
+ box-shadow:none!important;border-radius:6px;
+}
+button.nav-active{
+ background:var(--dt-selection)!important;
+ border-color:transparent!important;border-radius:6px;
+}
+.dtSharedChildren .dtSharedActive,aside nav a.dtSharedActive,
+aside nav a[class*="navActive"]{
+ background:rgba(255,255,255,.12)!important;color:#fff!important;
+ border-color:transparent!important;border-radius:6px!important;
+ box-shadow:none!important;
+}
+:where(button,a,input,select,textarea,summary):focus-visible{
+ outline:none!important;
+ box-shadow:0 0 0 4px var(--dt-focus-shade)!important;
+}
+:where(button,a,summary):focus:not(:focus-visible){
+ outline:none!important;box-shadow:none!important;
+}
+:where(input,select,textarea):focus{
+ outline:none!important;border-color:#c9cdd1!important;
+ box-shadow:0 0 0 4px var(--dt-focus-shade)!important;
+}
+.sort-wrap:focus-within{
+ outline:none!important;
+ box-shadow:0 0 0 4px var(--dt-focus-shade)!important;
+}
+@media(forced-colors:active){
+ :where(button,a,input,select,textarea,summary):focus-visible{
+  outline:2px solid Highlight!important;
+ }
+ button[aria-pressed="true"],button[aria-selected="true"]{
+  outline:1px solid Highlight!important;
+ }
+}
+
+/* Solid selected collection buttons */
+#collection .dt-edit-filters button.selected{
+ background:#171717!important;
+ color:#fff!important;
+ border-color:#171717!important;
+ border-radius:0!important;
+ box-shadow:none!important;
+}
+
+/* Restore original category-tab selection */
+#collection .filter-tabs button.current{
+ background:transparent!important;
+ color:#171717!important;
+ border-color:transparent!important;
+ border-bottom:2px solid #171717!important;
+ border-radius:0!important;
+ box-shadow:none!important;
+}
+
+/* Maroon product hero photo */
+.hero .hero-image{background-image:url('/images/dragontail-maroon-hero.png')!important;background-position:68% center;filter:none}
+@media(max-width:680px){.hero .hero-image{background-position:68% center}}
+
+/* DRAGONTAIL category product photos */
+.categories .women img{object-position:68% center}
+.categories .men img{object-position:50% 35%}
+.categories .accessories img{object-fit:contain;padding:20px 20px 85px;background:#f4f2ee}
+.mega-feature img[src*="dragontail-maroon-hero"]{object-position:68% center}
+.mega-feature img[src*="dragontail-scarf"]{object-fit:contain;padding:12px;background:#f4f2ee}
+.editorial-img img[src*="dragontail-woman-scarf"]{object-position:50% 35%}
+
+/* Admin-managed hero image */
+.hero .hero-image{background-image:var(--dt-hero-image,url('/images/dragontail-maroon-hero.png'))!important}
+
+/* Full-bleed accessories tile */
+.categories .category.accessories img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover !important;
+  object-position: 50% 50%;
+  padding: 0 !important;
+  display: block;
+}

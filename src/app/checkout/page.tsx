@@ -1,4 +1,6 @@
 'use client';
+import ColourLabel from '@/components/ColourLabel';
+
 import {useEffect,useState} from 'react';
 import Link from 'next/link';
 import {ArrowLeft,ArrowRight,Check,ChevronDown,LockKeyhole,MapPin,ShoppingBag,ShieldCheck} from 'lucide-react';
@@ -55,7 +57,7 @@ export default function Checkout(){
  </>}
  </section>
  <aside className={styles.summary}><div className={styles.sectionHeading}><ShoppingBag size={19}/><h2>Your selection</h2></div>
- {quote?quote.lines.map(line=><div className={styles.item} key={`${line.id}-${line.size}-${line.color}`}><div className={styles.image}>{line.image?<img src={line.image} alt={line.name}/>:null}</div><div><strong>{line.name}</strong><small>{line.color} / {line.size} · QTY {line.qty}</small><strong>{rupees(line.lineTotal)}</strong></div></div>):<p className={styles.muted}>Your items appear here after inventory verification.</p>}
+ {quote?quote.lines.map(line=><div className={styles.item} key={`${line.id}-${line.size}-${line.color}`}><div className={styles.image}>{line.image?<img src={line.image} alt={line.name}/>:null}</div><div><strong>{line.name}</strong><small><ColourLabel name={line.color}/> / {line.size} · QTY {line.qty}</small><strong>{rupees(line.lineTotal)}</strong></div></div>):<p className={styles.muted}>Your items appear here after inventory verification.</p>}
  <div className={styles.totals}><div><span>Subtotal</span><strong>{quote?rupees(quote.subtotal):'—'}</strong></div><div><span>Delivery</span><strong>{quote?rupees(quote.deliveryFee):'—'}</strong></div><div className={styles.total}><span>Total</span><strong>{quote?rupees(quote.total):'—'}</strong></div></div>
  <p className={styles.disclaimer}>{quote?.notice||'Amounts and availability will be confirmed by the server.'}</p><div className={styles.disclaimer}>No Razorpay payment can be made at this stage.</div></aside>
  </div></main>

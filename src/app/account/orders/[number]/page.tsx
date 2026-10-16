@@ -1,3 +1,4 @@
+import ColourLabel from '@/components/ColourLabel';
 import Link from 'next/link';
 import {notFound,redirect} from 'next/navigation';
 import {currentCustomer} from '@/lib/customer-auth';
@@ -21,7 +22,7 @@ export default async function OrderDetails({params}:{params:Promise<{number:stri
  <div className={styles.intro}><span className={styles.eyebrow}>YOUR ACCOUNT / ORDER DETAILS</span><h1>Order details<span className={styles.dot}>.</span></h1><p>Order {o.order_number} · Placed {new Date(o.created_at).toLocaleDateString('en-IN',{day:'numeric',month:'long',year:'numeric'})}</p></div>
  <div className={styles.detailLayout}><div className={styles.detailMain}>
   <section className={styles.panel}><div className={styles.sectionTitle}><h2>Items ordered</h2><span>{o.items.reduce((n,x)=>n+x.quantity,0)} ITEMS</span></div>
-  {o.items.map((i,n)=><div className={styles.lineItem} key={n}><div className={styles.detailThumb}>{i.image?<img src={i.image} alt={i.name}/>:<span>DT</span>}</div><div className={styles.lineInfo}><strong>{i.name}</strong><p>{i.color} / {i.size}</p><p>Quantity: {i.quantity}</p></div><strong>{rupees(i.unit_price*i.quantity)}</strong></div>)}
+  {o.items.map((i,n)=><div className={styles.lineItem} key={n}><div className={styles.detailThumb}>{i.image?<img src={i.image} alt={i.name}/>:<span>DT</span>}</div><div className={styles.lineInfo}><strong>{i.name}</strong><p><ColourLabel name={i.color}/> / {i.size}</p><p>Quantity: {i.quantity}</p></div><strong>{rupees(i.unit_price*i.quantity)}</strong></div>)}
   <div className={styles.totals}><div><span>Subtotal</span><strong>{rupees(o.subtotal)}</strong></div><div><span>Delivery</span><strong>{o.delivery_fee===0?'Free':rupees(o.delivery_fee)}</strong></div><div className={styles.grand}><span>Total</span><strong>{rupees(o.total)}</strong></div></div></section>
   <section className={styles.panel}><div className={styles.sectionTitle}><h2>Order progress</h2><span className={styles.status} data-state={o.status}>{label(o.status)}</span></div>
    {cancelled?<p className={styles.infoText}>This order is {label(o.status).toLowerCase()}. No further delivery progress is scheduled.</p>:idx===-1?<p className={styles.infoText}>Order request received. Payment has not yet been verified, so fulfilment has not started.</p>:<ol className={styles.timeline}>{progress.map((s,k)=><li key={s} className={k<=idx?styles.done:''}><span className={styles.timelineDot}/><div><strong>{label(s)}</strong>{k===idx?<p>Current status</p>:null}</div></li>)}</ol>}
