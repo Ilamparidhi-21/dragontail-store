@@ -41,3 +41,22 @@
 .dtCompactFilters summary:focus-visible,.dtActionMenu summary:focus-visible{outline:2px solid #111;outline-offset:2px}
 
 .dtAlertList{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;max-height:300px;overflow:auto}.dtAlertList button{text-align:left;display:grid;gap:6px;background:white;border:1px solid #ddd;padding:14px;min-height:64px;cursor:pointer}.dtReadiness{display:block;white-space:normal;font-size:11px;margin-top:6px;color:#666}.dtQuickActions{display:flex;gap:5px;margin-bottom:6px}.dtQuickActions button{min-height:36px;background:white;border:1px solid #bbb;padding:6px 10px;cursor:pointer}.dtReadinessPanel,.dtDetailsFields{padding:16px;border:1px solid #ddd}.dtReadinessPanel ul{padding-left:20px;line-height:1.8}.dtDetailsFields{display:grid;gap:14px;min-width:0}.dtForm textarea{width:100%;padding:10px;border:1px solid #bbb;font:inherit;resize:vertical}.dtMeasurementRow{display:grid;grid-template-columns:40px repeat(3,minmax(0,1fr));gap:8px;align-items:flex-end}.dtProdCell img{display:block!important;width:48px!important;height:64px!important;object-fit:cover!important}.dtForm input,.dtForm textarea,.dtForm select{max-width:100%}
+
+.dtNamePreset{display:block;width:100%;padding:11px;margin:6px 0;background:white;border:1px solid #bbb;text-align:left;cursor:pointer;min-height:44px}
+
+/* Clear product editor sections */
+.dtDrawer{width:min(820px,100vw)}
+.dtDrawerHead{position:sticky;top:0;z-index:3;background:#fff;padding:20px 26px}
+.dtForm{gap:24px;padding:24px;background:#f6f6f6}
+.dtEditorSection,.dtForm>.dtDetailsFields,.dtForm>.dtReadinessPanel{background:#fff;border:1px solid #dedede;border-radius:10px;padding:22px;min-width:0}
+.dtEditorSection{display:grid;gap:18px}
+.dtEditorSection h3,.dtVariantTop h3{font-size:17px;margin:0;color:#111;letter-spacing:0;font-weight:650}
+.dtEditorSection p{font-size:13px;line-height:1.6;color:#666;margin:0;letter-spacing:0;font-weight:400}
+.dtDetailsFields legend{font-size:16px;font-weight:650;padding:0 8px}
+.dtForm label{letter-spacing:.04em;line-height:1.5}
+.dtForm input:not([type=checkbox]),.dtForm select,.dtForm textarea{min-height:44px;font-size:14px}
+.dtForm input:focus-visible,.dtForm select:focus-visible,.dtForm textarea:focus-visible{outline:2px solid #222;outline-offset:2px}
+.dtEditorFooter{position:sticky;bottom:0;z-index:2;display:flex;align-items:center;justify-content:space-between;gap:15px;background:#fff;border:1px solid #ddd;border-radius:8px;padding:14px;box-shadow:0 -5px 18px #00000008}
+.dtEditorFooter span{font-size:12px;color:#666}
+.dtEditorFooter button{min-height:44px}
+@media(max-width:540px){.dtForm{padding:14px;gap:18px}.dtEditorSection,.dtForm>.dtDetailsFields,.dtForm>.dtReadinessPanel{padding:16px}.dtDrawerHead{padding:16px}.dtEditorFooter span{display:none}.dtEditorFooter button{width:100%}.dtMeasurementRow{grid-template-columns:28px repeat(3,minmax(0,1fr));gap:5px}.dtMeasurementRow label{font-size:10px}.dtMeasurementRow input{padding:8px!important}}

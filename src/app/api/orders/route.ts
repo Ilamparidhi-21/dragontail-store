@@ -1,4 +1,5 @@
 import {NextRequest,NextResponse} from 'next/server';
+import {normaliseCartSizes} from '@/lib/cart-sizes';
 import {db} from '@/lib/db';
 import {currentCustomer,safeMutation} from '@/lib/customer-auth';
 import {notifyNewOrder} from '@/lib/order-mail';
@@ -13,11 +14,12 @@ export async function POST(req:NextRequest){
  const v=(k:string,max:number)=>typeof raw[k]==='string'?raw[k].trim().slice(0,max):'';
  const recipient=v('recipient',100),address=v('address_line1',180),address2=v('address_line2',180),city=v('city',90),state=v('state',90),postal=v('postal_code',12);
  if(!recipient||!address||!city||!state||!/^[0-9]{6}$/.test(postal))return NextResponse.json({error:'Complete Indian delivery address required'},{status:400});
- const items=raw.items.map((x:Record<string,unknown>)=>({id:Number(x.id),color:String(x.color||''),size:String(x.size||''),qty:Number(x.qty)}));
- if(items.some((x:{id:number;color:string;size:string;qty:number})=>!Number.isSafeInteger(x.id)||x.id<1||!x.color||!x.size||!Number.isInteger(x.qty)||x.qty<1||x.qty>20))return NextResponse.json({error:'Invalid item quantities'},{status:400});
+ let items=raw.items.map((x:Record<string,unknown>)=>({id:Number(x.id),color:String(x.color||''),size:String(x.size||''),qty:Number(x.qty)}));
+ if(items.some((x:{id:number;color:string;size:string;qty:number})=>!Number.isSafeInteger(x.id)||x.id<1||!x.color||!Number.isInteger(x.qty)||x.qty<1||x.qty>20))return NextResponse.json({error:'Invalid item quantities'},{status:400});
  const unique=new Set(items.map((x:{id:number;color:string;size:string})=>JSON.stringify([x.id,x.color,x.size])));if(unique.size!==items.length)return NextResponse.json({error:'Duplicate cart variants'},{status:400});
  const conn=await db.connect();let order:{id:number;order_number:string;email:string;total:number}|null=null;
  try{await conn.query('BEGIN');await conn.query("SET LOCAL lock_timeout = '3s'");
+ items=await normaliseCartSizes(items,conn);if(items.some((x:{size:string;qty:number})=>!x.size||x.qty>20)){await conn.query('ROLLBACK');return NextResponse.json({error:'Invalid size or quantity'},{status:400});}
  let subtotal=0;const lines: {id:number;name:string;color:string;size:string;qty:number;price:number}[]=[];
  for(const x of items){const r=await conn.query(`SELECT p.id,p.name,p.price,i.quantity FROM dt_products p JOIN dt_inventory i ON i.product_id=p.id AND i.color=$2 AND i.size=$3 WHERE p.id=$1 AND p.active=true`,[x.id,x.color,x.size]);if(!r.rows.length||Number(r.rows[0].quantity)<x.qty){await conn.query('ROLLBACK');return NextResponse.json({error:`Unavailable stock: ${x.color} / ${x.size}`},{status:409})}const p=r.rows[0];subtotal+=Number(p.price)*x.qty;lines.push({...x,name:p.name,price:Number(p.price)})}
  const fee=subtotal>=4999?0:0; // shipping not charged until policy is finalized
